@@ -131,6 +131,7 @@ namespace PartialityLauncher {
                     File.Delete( partialityModLocation );
 
                 File.Copy( Directory.GetFiles( gameDirectory, "Partiality.dll", SearchOption.TopDirectoryOnly )[0], partialityModLocation );
+                Console.WriteLine( ( '"' + unityEngine + '"' ) + " " + ( '"' + partialityLocation + '"' ) + " " + ( '"' + moddedDLL + '"' ) );
                 monomodProcess.StartInfo.Arguments = ( '"' + unityEngine + '"' ) + " " + ( '"' + partialityLocation + '"' ) + " " + ( '"' + moddedDLL + '"' );
 
                 monomodProcess.Start();
@@ -141,9 +142,9 @@ namespace PartialityLauncher {
                 Console.WriteLine( "MMEC:" + exitCode );
 
                 //Move modded .dll over original .dll
-                File.Delete(unityEngine);
-                File.Copy(moddedDLL, unityEngine);
-                File.Delete(moddedDLL);
+                File.Delete( unityEngine );
+                File.Copy( moddedDLL, unityEngine );
+                File.Delete( moddedDLL );
             }
 
 
@@ -197,7 +198,7 @@ namespace PartialityLauncher {
             Directory.Delete( from.FullName, true );
             Directory.CreateDirectory( managedFolder );
             CopyFilesRecursively( to, from );
-            Directory.Delete(backupFolder, true);
+            Directory.Delete( backupFolder, true );
         }
 
         public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target) {

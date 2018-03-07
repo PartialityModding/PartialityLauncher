@@ -121,6 +121,8 @@ namespace PartialityLauncher {
             monomodProcess.StartInfo.UseShellExecute = false;
             monomodProcess.StartInfo.RedirectStandardOutput = true;
 
+            StringBuilder sb = new StringBuilder();
+
             //First, patch the UnityEngine.dll with Partiality. Partiality gets special treatement because it's special.
             {
                 string moddedDLL = Path.GetDirectoryName( unityEngine ) + "\\patched_UnityEngine.dll";
@@ -135,11 +137,14 @@ namespace PartialityLauncher {
                 monomodProcess.StartInfo.Arguments = ( '"' + unityEngine + '"' ) + " " + ( '"' + partialityLocation + '"' ) + " " + ( '"' + moddedDLL + '"' );
 
                 monomodProcess.Start();
-                Console.WriteLine( monomodProcess.StandardOutput.ReadToEnd() );
+                string mmoutput = monomodProcess.StandardOutput.ReadToEnd();
+                Console.WriteLine( mmoutput );
                 monomodProcess.WaitForExit();
 
                 int exitCode = monomodProcess.ExitCode;
                 Console.WriteLine( "MMEC:" + exitCode );
+                sb.Append( mmoutput );
+
 
                 //Move modded .dll over original .dll
                 File.Delete( unityEngine );
@@ -164,13 +169,24 @@ namespace PartialityLauncher {
                     monomodProcess.StartInfo.Arguments = ( '"' + csharpPath + '"' ) + " " + ( '"' + patchLocation + '"' ) + " " + ( '"' + moddedDLL + '"' );
 
                     monomodProcess.Start();
-                    Console.WriteLine( monomodProcess.StandardOutput.ReadToEnd() );
+                    string mmop = monomodProcess.StandardOutput.ReadToEnd();
+                    Console.WriteLine( mmop );
                     monomodProcess.WaitForExit();
+
+                    sb.AppendLine("----------------");
+                    sb.AppendLine(mmop);
 
                     int exitCode = monomodProcess.ExitCode;
                     Console.WriteLine( "MMEC:" + exitCode );
                 }
+
+                //Move modded .dll over original .dll
+                File.Delete( csharpPath );
+                File.Copy( moddedDLL, csharpPath );
+                File.Delete( moddedDLL );
             }
+
+            File.WriteAllText( gameDirectory + "\\MONOMOD_OUTPUT.txt", sb.ToString() );
 
         }
 

@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PartialityLauncher", "PartialityLauncher\PartialityLauncher.csproj", "{C88D23C6-B9A8-4914-A412-609494ABFFA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoMod", "lib-projs\MonoMod\MonoMod.csproj", "{8A17C958-5C33-4035-AF76-F94A3AA2DC4F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoMod", "..\PartialityPatch\lib-projs\MonoMod\MonoMod.csproj", "{8A17C958-5C33-4035-AF76-F94A3AA2DC4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

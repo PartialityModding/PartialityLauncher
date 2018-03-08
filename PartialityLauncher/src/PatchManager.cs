@@ -154,36 +154,41 @@ namespace PartialityLauncher {
 
 
             //Now, patch all the other .dll's
-            {
+            try{
 
                 //Copy dependencies
                 CopyFilesRecursively( new DirectoryInfo( gameDirectory + "\\PatchDependencies" ), new DirectoryInfo( Path.GetDirectoryName( csharpPath ) ) );
 
                 string moddedDLL = Path.GetDirectoryName( csharpPath ) + "\\patched_Assembly-CSharp.dll";
 
-                foreach( string s in enabledPatches ) {
-                    if( !allAvaliableMods.ContainsKey( s ) )
-                        continue;
+                if( enabledPatches.Count > 0 ) {
 
-                    string patchLocation = allAvaliableMods[s];
-                    monomodProcess.StartInfo.Arguments = ( '"' + csharpPath + '"' ) + " " + ( '"' + patchLocation + '"' ) + " " + ( '"' + moddedDLL + '"' );
+                    foreach( string s in enabledPatches ) {
+                        if( !allAvaliableMods.ContainsKey( s ) )
+                            continue;
 
-                    monomodProcess.Start();
-                    string mmop = monomodProcess.StandardOutput.ReadToEnd();
-                    Console.WriteLine( mmop );
-                    monomodProcess.WaitForExit();
+                        string patchLocation = allAvaliableMods[s];
+                        monomodProcess.StartInfo.Arguments = ( '"' + csharpPath + '"' ) + " " + ( '"' + patchLocation + '"' ) + " " + ( '"' + moddedDLL + '"' );
 
-                    sb.AppendLine("----------------");
-                    sb.AppendLine(mmop);
+                        monomodProcess.Start();
+                        string mmop = monomodProcess.StandardOutput.ReadToEnd();
+                        Console.WriteLine( mmop );
+                        monomodProcess.WaitForExit();
 
-                    int exitCode = monomodProcess.ExitCode;
-                    Console.WriteLine( "MMEC:" + exitCode );
+                        sb.AppendLine( "----------------" );
+                        sb.AppendLine( mmop );
+
+                        int exitCode = monomodProcess.ExitCode;
+                        Console.WriteLine( "MMEC:" + exitCode );
+                    }
+
+                    //Move modded .dll over original .dll
+                    File.Delete( csharpPath );
+                    File.Copy( moddedDLL, csharpPath );
+                    File.Delete( moddedDLL );
                 }
-
-                //Move modded .dll over original .dll
-                File.Delete( csharpPath );
-                File.Copy( moddedDLL, csharpPath );
-                File.Delete( moddedDLL );
+            } catch (System.Exception e){
+                sb.AppendLine( e.ToString() );
             }
 
             File.WriteAllText( gameDirectory + "\\MONOMOD_OUTPUT.txt", sb.ToString() );

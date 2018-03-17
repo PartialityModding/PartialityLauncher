@@ -123,12 +123,16 @@ namespace PartialityLauncher {
         }
 
         private void RestoreBackupButton_Click(object sender, EventArgs e) {
-            PatchManager.RestoreBackup( Directory.GetDirectories( Path.GetDirectoryName( Application.ExecutablePath ), "Managed", SearchOption.AllDirectories )[0] );
-            RestoreBackupButton.Refresh();
+            string[] infs = Directory.GetDirectories( Path.GetDirectoryName( Application.ExecutablePath ), "Managed", SearchOption.AllDirectories );
+            if( infs.Length > 0 ) {
+                PatchManager.RestoreBackup(infs[0]);
+                RestoreBackupButton.Refresh();
+            }
         }
 
         private void RestoreBackupButton_Paint(object sender, PaintEventArgs e) {
-            if( Directory.Exists( Directory.GetDirectories( Path.GetDirectoryName( Application.ExecutablePath ), "Managed", SearchOption.AllDirectories )[0] + "_backup" ) ) {
+            string[] infs = Directory.GetDirectories( Path.GetDirectoryName( Application.ExecutablePath ), "Managed", SearchOption.AllDirectories );
+            if( infs.Length > 0 && Directory.Exists( infs[0] + "_backup" ) ) {
                 RestoreBackupButton.Visible = true;
             } else {
                 RestoreBackupButton.Visible = false;

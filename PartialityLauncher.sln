@@ -1,11 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PartialityLauncher", "PartialityLauncher\PartialityLauncher.csproj", "{C88D23C6-B9A8-4914-A412-609494ABFFA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoMod", "..\PartialityPatch\lib-projs\MonoMod\MonoMod.csproj", "{8A17C958-5C33-4035-AF76-F94A3AA2DC4F}"
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "MonoMod", "lib-projs\MonoMod\MonoMod.exe", "{948AC1CE-C49A-4BD2-AC8C-869879A89E69}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = C:\Users\Rioku\Documents\GitHub\PartialityLauncher\lib-projs\MonoMod\MonoMod.exe
+		RemoteMachine = ERZA_SCARLET
+		StartingDirectory = C:\Users\Rioku\Documents\GitHub\PartialityLauncher\lib-projs\MonoMod
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		UseLegacyDebugEngines = No
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +28,8 @@ Global
 		{C88D23C6-B9A8-4914-A412-609494ABFFA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C88D23C6-B9A8-4914-A412-609494ABFFA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C88D23C6-B9A8-4914-A412-609494ABFFA5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8A17C958-5C33-4035-AF76-F94A3AA2DC4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A17C958-5C33-4035-AF76-F94A3AA2DC4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A17C958-5C33-4035-AF76-F94A3AA2DC4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A17C958-5C33-4035-AF76-F94A3AA2DC4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{948AC1CE-C49A-4BD2-AC8C-869879A89E69}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{948AC1CE-C49A-4BD2-AC8C-869879A89E69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

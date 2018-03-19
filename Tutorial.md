@@ -9,6 +9,7 @@ There's two kinds of mods supported by Partiality.
 Now that that's out of the way...
 
 __***Installing Partiality for non-modders***__
+
 If you're not looking to make mods, using Partiality is extremely simple.
 1 : Download the Partiality Launcher from the "Releases" section of the github (https://github.com/PartialityModding/PartialityLauncher/releases)
 2 : Extract the .zip file into the folder of the Unity game you want to use (So that PartialityLauncher.exe is right next to the game's .exe

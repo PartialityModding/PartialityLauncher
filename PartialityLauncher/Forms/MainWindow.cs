@@ -21,7 +21,7 @@ namespace PartialityLauncher {
         }
 
         private void Run_Game_Click(object sender, EventArgs e) {
-            PatchManager.SavePatchInfos( Path.GetDirectoryName( Application.ExecutablePath ).ToString() );
+            PatchManager.SavePatchInfos( Path.GetDirectoryName( Application.ExecutablePath ) );
             RunGameButton.Enabled = false;
             EnabledModBox.Enabled = false;
             DisabledModBox.Enabled = false;
@@ -29,7 +29,7 @@ namespace PartialityLauncher {
             SwapButton.Enabled = false;
             RestoreBackupButton.Enabled = false;
 
-            PatchManager.PatchGame( Path.GetDirectoryName( Application.ExecutablePath ).ToString() );
+            PatchManager.PatchGame( Path.GetDirectoryName( Application.ExecutablePath ) );
 
             GameManager.RunGame(EnableElements);
         }
@@ -58,8 +58,8 @@ namespace PartialityLauncher {
 
         private void LoadGameStats() {
             string executionLocation = Application.ExecutablePath;
-            string gameExecutable = ExecutableFinder.FindExecutable( Path.GetDirectoryName( executionLocation ).ToString() );
-            string exePath = Path.Combine( Path.GetDirectoryName( executionLocation ).ToString(), gameExecutable );
+            string gameExecutable = ExecutableFinder.FindExecutable( Path.GetDirectoryName( executionLocation ) );
+            string exePath = Path.Combine( Path.GetDirectoryName( executionLocation ), gameExecutable );
 
             GameLabel.Text = Path.GetFileNameWithoutExtension( exePath );
             GameIcon.Image = Icon.ExtractAssociatedIcon( exePath ).ToBitmap();
@@ -104,7 +104,7 @@ namespace PartialityLauncher {
         }
 
         private void RefreshButton_Click(object sender, EventArgs e) {
-            PatchManager.SavePatchInfos( Path.GetDirectoryName( Application.ExecutablePath ).ToString() );
+            PatchManager.SavePatchInfos( Path.GetDirectoryName( Application.ExecutablePath ) );
             PatchManager.LoadPatches( Path.GetDirectoryName( Application.ExecutablePath ) );
             BuildPatchLists();
         }

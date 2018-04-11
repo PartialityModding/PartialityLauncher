@@ -13,13 +13,14 @@ __***Installing Partiality for non-modders***__
 If you're not looking to make mods, using Partiality is extremely simple.
 1. Download the Partiality Launcher from the "Releases" section of the github (https://github.com/PartialityModding/PartialityLauncher/releases)
 2. Extract the .zip file anywhere you want.
-3. Press "File" at the top, then "Open Game"
-4. Find your game's .exe and select it
-5. Once you have it selected, press "Patch Game" at the bottom.
-6. It will patch the game and create folders for you
-7. Navigate to the game's folder
-8. Put mods in the "Mods" folder
-9. Re-Launch partiality, and enable/disable mods as you need. Press "Patch Game" whenever you're ready, and press "Yes" when it asks you to launch the game.
+3. Run "Partiality Launcher.bat"
+4. Press "File" at the top, then "Open Game"
+5. Find your game's .exe and select it
+6. Once you have it selected, press "Patch Game" at the bottom.
+7. It will patch the game and create folders for you
+8. Navigate to the game's folder
+9. Put mods in the "Mods" folder
+10. Re-Launch partiality, and enable/disable mods as you need. Press "Patch Game" whenever you're ready, and press "Yes" when it asks you to launch the game.
 
 __***Making DLL Mods***__
 

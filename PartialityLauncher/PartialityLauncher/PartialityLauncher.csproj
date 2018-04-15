@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>PartialityLauncher</RootNamespace>
+    <PackageVersion>1.0</PackageVersion>
+    <Title>PartialityLauncher</Title>
+    <Copyright>Copyright © 2018</Copyright>
+    <Description>A launcher used to install mods and patches in games</Description>
+    <SignAssembly>true</SignAssembly>
+    <Version>0.3</Version>
+    <PackageProjectUrl>https://github.com/PartialityModding</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PartialityModding</RepositoryUrl>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Eto.Forms" Version="2.4.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\..\..\Mod References\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod">
+      <HintPath>..\..\..\Mod References\MonoMod.exe</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour.HookGen">
+      <HintPath>..\..\..\Mod References\MonoMod.RuntimeDetour.HookGen.exe</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+</Project>

@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net461</TargetFramework>
+    <ApplicationIcon />
+    <Win32Resource />
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\PartialityLauncher\PartialityLauncher.csproj" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Eto.Platform.Wpf" Version="2.4.1" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.4.1" />
+    <PackageReference Include="Eto.Platform.Mac64" Version="2.4.1" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\..\..\Mod References\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb">
+      <HintPath>..\..\..\Mod References\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>..\..\..\Mod References\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks">
+      <HintPath>..\..\..\Mod References\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod">
+      <HintPath>..\..\..\Mod References\MonoMod.exe</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>..\..\..\Mod References\MonoMod.RuntimeDetour.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour.HookGen">
+      <HintPath>..\..\..\Mod References\MonoMod.RuntimeDetour.HookGen.exe</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>..\..\..\Mod References\MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Partiality">
+      <HintPath>..\..\..\Mod References\Partiality.dll</HintPath>
+    </Reference>
+    <Reference Include="PartialityPatch">
+      <HintPath>..\..\..\Mod References\PartialityPatch.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+	
+</Project>

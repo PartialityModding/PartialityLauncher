@@ -16,23 +16,23 @@ namespace PartialityLauncher {
     public static class PatchManager {
         public readonly static HashAlgorithm ChecksumHasher = MD5.Create();
 
-
         public static void PatchGame() {
             string executablePath = Assembly.GetEntryAssembly().Location;
             string executableDirectory = Directory.GetParent( executablePath ).FullName;
-            string monoModPath = executableDirectory + "\\MonoMod.exe";
-            string hookGenPath = executableDirectory + "\\MonoMod.RuntimeDetour.HookGen.exe";
-            string runtimeDetourDLL = "\\MonoMod.RuntimeDetour.dll";
-            string mmUtilsDLL = "\\MonoMod.Utils.dll";
+            string monoModPath = Path.Combine( executableDirectory, "MonoMod.exe" );
+            string hookGenPath = Path.Combine( executableDirectory, "MonoMod.RuntimeDetour.HookGen.exe" );
+            string runtimeDetourDLL = "MonoMod.RuntimeDetour.dll";
+            string mmUtilsDLL = "MonoMod.Utils.dll";
+            string jsonDLL = "YamlDotNet.dll";
 
             string gameDirectory = Directory.GetParent( GameManager.exePath ).FullName;
-            string hashesFolder = gameDirectory + "\\PartialityHashes";
-            string modDependencies = gameDirectory + "\\ModDependencies";
-            string dataDirectory = gameDirectory + "\\" + Path.GetFileNameWithoutExtension( GameManager.exePath ) + "_Data";
-            string managedFolder = dataDirectory + "\\Managed";
-            string codeDll = managedFolder + "\\Assembly-CSharp.dll";
-            string hookGenDLL = managedFolder + "\\HOOKED-Assembly-CSharp.dll";
-            string engineDll = managedFolder + "\\UnityEngine.dll";
+            string hashesFolder = Path.Combine( gameDirectory, "PartialityHashes" );
+            string modDependencies = Path.Combine( gameDirectory, "ModDependencies" );
+            string dataDirectory = Path.Combine( gameDirectory, Path.GetFileNameWithoutExtension( GameManager.exePath ) + "_Data" );
+            string managedFolder = Path.Combine( dataDirectory, "Managed" );
+            string codeDll = Path.Combine( managedFolder, "Assembly-CSharp.dll" );
+            string hookGenDLL = Path.Combine( managedFolder, "HOOKS-Assembly-CSharp.dll" );
+            string engineDll = Path.Combine( managedFolder, "UnityEngine.dll" );
 
             string backupFolder = managedFolder + "_backup";
 
@@ -52,29 +52,29 @@ namespace PartialityLauncher {
 
             //Install the default patch for Partiality
             {
-                string moddedDLL = Path.GetDirectoryName( engineDll ) + "\\patched_UnityEngine.dll";
-                string defaultPatchLocation = executableDirectory + "\\PartialityPatch.dll";
-                string partialityModLocation = Path.GetDirectoryName( engineDll ) + "\\Partiality.dll";
+                string moddedDLL = Path.Combine( Path.GetDirectoryName( engineDll ), "patched_UnityEngine.dll" );
+                string defaultPatchLocation = Path.Combine( executableDirectory, "PartialityPatch.dll" );
+                string partialityModLocation = Path.Combine( Path.GetDirectoryName( engineDll ), "Partiality.dll" );
 
                 bool shouldPatch = false;
 
-                if( !File.Exists( hashesFolder + "\\ENGINEHASH.hash" ) ) {
+                if( !File.Exists( Path.Combine( hashesFolder, "ENGINEHASH.hash" ) ) ) {
                     shouldPatch = true;
                 } else {
-                    shouldPatch = !ModMetadata.CompareHashes( defaultPatchLocation, hashesFolder + "\\ENGINEHASH.hash" );
+                    shouldPatch = !ModMetadata.CompareHashes( defaultPatchLocation, Path.Combine( hashesFolder, "ENGINEHASH.hash" ) );
                 }
 
                 //Delete mod if it exists
                 if( File.Exists( partialityModLocation ) )
                     File.Delete( partialityModLocation );
                 //Copy mod to folder with assembly-chsharp.dll
-                File.Copy( Directory.GetFiles( executableDirectory, "Partiality.dll", SearchOption.TopDirectoryOnly )[0], partialityModLocation );
+                File.Copy( Path.Combine( executableDirectory, "Partiality.dll" ), partialityModLocation );
 
                 if( shouldPatch ) {
 
                     //Restore backup
                     File.Delete( engineDll );
-                    File.Copy( backupFolder + "\\UnityEngine.dll", engineDll );
+                    File.Copy( Path.Combine( backupFolder, "UnityEngine.dll" ), engineDll );
 
                     //Set monomod arguments to "[UnityEngine.dll] [PartialityPatch.dll] [patched_UnityEngine.dll]"
 
@@ -98,10 +98,9 @@ namespace PartialityLauncher {
                     }
 
                     byte[] newHash = ChecksumHasher.ComputeHash( File.ReadAllBytes( defaultPatchLocation ) );
-                    File.WriteAllBytes( hashesFolder + "\\ENGINEHASH.hash", newHash );
+                    File.WriteAllBytes( Path.Combine( hashesFolder, "ENGINEHASH.hash" ), newHash );
                 }
             }
-
 
             //Install custom patches
             {
@@ -113,25 +112,27 @@ namespace PartialityLauncher {
                 foreach( string dependency in files ) {
                     string fileName = Path.GetFileName( dependency );
                     //Delete the dependency if it already exists
-                    if( File.Exists( managedFolder + "\\" + fileName ) )
-                        File.Delete( managedFolder + "\\" + fileName );
+                    if( File.Exists( Path.Combine( managedFolder, fileName ) ) )
+                        File.Delete( Path.Combine( managedFolder, fileName ) );
                     //Copy the file
-                    File.Copy( dependency, managedFolder + "\\" + fileName );
+                    File.Copy( dependency, Path.Combine( managedFolder, fileName ) );
                 }
 
                 bool shouldPatch = false;
-                string moddedDLL = Path.GetDirectoryName( engineDll ) + "\\patched_Assembly-CSharp.dll";
-                string epListLocation = hashesFolder + "\\ENABLEDPATCHES.enp";
+                string moddedDLL = Path.Combine( Path.GetDirectoryName( engineDll ), "patched_Assembly-CSharp.dll" );
+                string epListLocation = Path.Combine( hashesFolder, "ENABLEDPATCHES.enp" );
 
 
                 //Check if we have the same enabled/disabled mods as last time, if we do, then 
                 {
                     string totalEnabledPatches = "Partiality+";
                     foreach( ModMetadata md in GameManager.modMetas ) {
-                        if( md.isPatch && md.isEnabled ) {
+                        if( ( md.isStandalone || md.isPatch ) && md.isEnabled ) {
                             totalEnabledPatches += Path.GetFileNameWithoutExtension( md.modPath ) + "+";
                         }
                     }
+
+                    DebugLogger.Log( totalEnabledPatches );
 
                     if( File.Exists( epListLocation ) ) {
                         string getList = File.ReadAllText( epListLocation );
@@ -154,11 +155,15 @@ namespace PartialityLauncher {
                     }
                 }
 
-                DebugLogger.Log( shouldPatch + " patching " );
-
                 if( shouldPatch ) {
+                    DebugLogger.Log( "Patching Assembly-CSharp" );
 
-                    string backupDll = backupFolder + "\\Assembly-CSharp.dll";
+                    string backupDll = Path.Combine( backupFolder, "Assembly-CSharp.dll" );
+
+                    foreach( ModMetadata md in GameManager.modMetas ) {
+                        if( md.isStandalone && md.isEnabled )
+                            backupDll = md.modPath;
+                    }
 
                     //Restore backup
                     File.Delete( codeDll );
@@ -198,57 +203,32 @@ namespace PartialityLauncher {
                     } catch( System.Exception e ) {
                         DebugLogger.Log( e );
                     }
-
-                    //HookGen stuff
-                    {
-
-                        //Delete files if they existed, so we can update them.
-                        if( File.Exists( managedFolder + runtimeDetourDLL ) )
-                            File.Delete( managedFolder + runtimeDetourDLL );
-                        if( File.Exists( managedFolder + mmUtilsDLL ) )
-                            File.Delete( managedFolder + mmUtilsDLL );
-
-                        //Copy files
-                        File.Copy( executableDirectory + runtimeDetourDLL, managedFolder + runtimeDetourDLL );
-                        File.Copy( executableDirectory + mmUtilsDLL, managedFolder + mmUtilsDLL );
-
-                        string pathIn = codeDll;
-                        string pathOut = hookGenDLL;
-
-                        using( MonoModder mm = new MonoModder {
-                            InputPath = pathIn,
-                            OutputPath = pathOut
-                        } ) {
-                            mm.Read();
-                            mm.MapDependencies();
-                            if( File.Exists( pathOut ) ) {
-                                mm.Log( string.Format( "Clearing {0}", pathOut ) );
-                                File.Delete( pathOut );
-                            }
-                            mm.Log( "[HookGen] Starting HookGenerator" );
-                            HookGenerator gen = new HookGenerator( mm, Path.GetFileName( pathOut ) );
-                            using( ModuleDefinition mOut = gen.OutputModule ) {
-                                gen.Generate();
-                                mOut.Write( pathOut );
-                            }
-                            mm.Log( "[HookGen] Done." );
-                        }
-                    }
                 }
             }
 
             //HookGen stuff
-            if( !File.Exists( hookGenDLL ) ) {
+            {
+
+                //Delete Legacy DLL
+                if( File.Exists( Path.Combine( managedFolder, "HOOKS-Assembly-CSharp.dll" ) ) )
+                    File.Delete( Path.Combine( managedFolder, "HOOKS-Assembly-CSharp.dll" ) );
+
+                if( File.Exists( hookGenDLL ) ) {
+                    File.Delete( hookGenDLL );
+                }
 
                 //Delete files if they existed, so we can update them.
-                if( File.Exists( managedFolder + runtimeDetourDLL ) )
-                    File.Delete( managedFolder + runtimeDetourDLL );
-                if( File.Exists( managedFolder + mmUtilsDLL ) )
-                    File.Delete( managedFolder + mmUtilsDLL );
+                if( File.Exists( Path.Combine( managedFolder, runtimeDetourDLL ) ) )
+                    File.Delete( Path.Combine( managedFolder, runtimeDetourDLL ) );
+                if( File.Exists( Path.Combine( managedFolder, mmUtilsDLL ) ) )
+                    File.Delete( Path.Combine( managedFolder, mmUtilsDLL ) );
+                if( File.Exists( Path.Combine( managedFolder, jsonDLL ) ) )
+                    File.Delete( Path.Combine( managedFolder, jsonDLL ) );
 
                 //Copy files
-                File.Copy( executableDirectory + runtimeDetourDLL, managedFolder + runtimeDetourDLL );
-                File.Copy( executableDirectory + mmUtilsDLL, managedFolder + mmUtilsDLL );
+                File.Copy( Path.Combine( executableDirectory, runtimeDetourDLL ), Path.Combine( managedFolder, runtimeDetourDLL ) );
+                File.Copy( Path.Combine( executableDirectory, mmUtilsDLL ), Path.Combine( managedFolder, mmUtilsDLL ) );
+                File.Copy( Path.Combine( executableDirectory, jsonDLL ), Path.Combine( managedFolder, jsonDLL ) );
 
                 string pathIn = codeDll;
                 string pathOut = hookGenDLL;
@@ -279,7 +259,6 @@ namespace PartialityLauncher {
         public static void CopyFilesRecursively(string source, string target) {
             CopyFilesRecursively( new DirectoryInfo( source ), new DirectoryInfo( target ) );
         }
-
         public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target) {
             foreach( DirectoryInfo dir in source.GetDirectories() )
                 CopyFilesRecursively( dir, target.CreateSubdirectory( dir.Name ) );

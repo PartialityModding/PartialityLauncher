@@ -27,6 +27,9 @@
     <Reference Include="MonoMod.RuntimeDetour.HookGen">
       <HintPath>..\..\..\Mod References\MonoMod.RuntimeDetour.HookGen.exe</HintPath>
     </Reference>
+    <Reference Include="YamlDotNet">
+      <HintPath>..\..\..\Mod References\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   <ItemGroup>

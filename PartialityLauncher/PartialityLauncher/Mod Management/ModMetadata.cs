@@ -8,6 +8,7 @@ using System.Reflection;
 using Mono.Cecil;
 using System.Security.Cryptography;
 using System.Diagnostics;
+using YamlDotNet.Serialization;
 
 namespace PartialityLauncher {
     public class ModMetadata {
@@ -16,14 +17,15 @@ namespace PartialityLauncher {
         public bool isEnabled;
         public bool isPatch;
         public bool isDirty;
+        public bool isStandalone;
 
         public string modPath;
 
         public Dictionary<string, HashSet<string>> modifiedClasses = new Dictionary<string, HashSet<string>>();
 
         public static ModMetadata GetForMod(string file) {
-            string metaFilePath = Directory.GetParent( file ) + "\\" + Path.GetFileNameWithoutExtension( file ) + ".modMeta";
-            string hashFilePath = Directory.GetParent( file ) + "\\" + Path.GetFileNameWithoutExtension( file ) + ".modHash";
+            string metaFilePath = Path.Combine( Directory.GetParent( file ).FullName, Path.GetFileNameWithoutExtension( file ) + ".modMeta" );
+            string hashFilePath = Path.Combine( Directory.GetParent( file ).FullName, Path.GetFileNameWithoutExtension( file ) + ".modHash" );
             DebugLogger.Log( "Checking for modmeta at " + metaFilePath );
             if( !File.Exists( metaFilePath ) ) {
                 GenerateHashForMod( file, hashFilePath );
@@ -33,8 +35,8 @@ namespace PartialityLauncher {
             }
         }
         public static void SaveMod(ModMetadata md) {
-            string metaFilePath = Directory.GetParent( md.modPath ) + "\\" + Path.GetFileNameWithoutExtension( md.modPath ) + ".modMeta";
-            string hashFilePath = Directory.GetParent( md.modPath ) + "\\" + Path.GetFileNameWithoutExtension( md.modPath ) + ".modHash";
+            string metaFilePath = Path.Combine( Directory.GetParent( md.modPath ).FullName, Path.GetFileNameWithoutExtension( md.modPath ) + ".modMeta" );
+            string hashFilePath = Path.Combine( Directory.GetParent( md.modPath ).FullName, Path.GetFileNameWithoutExtension( md.modPath ) + ".modHash" );
 
             GenerateHashForMod( md.modPath, hashFilePath );
             WriteToFile( md, metaFilePath );
@@ -137,81 +139,74 @@ namespace PartialityLauncher {
         public static ModMetadata ReadFromFile(string metaFile, string hashFile, string modFile) {
 
             //Check for hash mismatch
+            if( !File.Exists( hashFile ) ) {
+                GenerateHashForMod( modFile, hashFile );
+            }
             bool isMatch = CompareHashes( modFile, hashFile );
 
-            string[] text = File.ReadAllLines( metaFile );
+            string text = File.ReadAllText( metaFile );
             int index = 0;
-
-            if( text.Length < 2 ) {
-                throw new Exception( "Not enough strings in metadata file! " + metaFile );
-            }
 
             ModMetadata meta = new ModMetadata();
 
-            meta.isEnabled = bool.Parse( text[index++] );
-            meta.isPatch = bool.Parse( text[index++] );
-            meta.isDirty = bool.Parse( text[index++] );
+            Deserializer ds = new Deserializer();
+            ModJSONMetadata jsonMeta = ds.Deserialize<ModJSONMetadata>( text );
 
-            if( !isMatch ) {
-                ModMetadata genMeta = GenerateForMod( modFile );
-                genMeta.isEnabled = meta.isEnabled;
-                genMeta.isPatch = meta.isPatch;
-                genMeta.isDirty = true;
-                meta = genMeta;
+            meta.isEnabled = jsonMeta.isEnabled;
+            meta.isPatch = jsonMeta.isPatch;
+            meta.isDirty = jsonMeta.isDirty;
+            meta.isStandalone = jsonMeta.isStandalone;
 
-                WriteToFile( meta, metaFile );
-                DebugLogger.Log( "Generated Data For " + modFile );
-                return meta;
+            meta.modifiedClasses = new Dictionary<string, HashSet<string>>();
+            foreach( KeyValuePair<string, List<string>> kvp in jsonMeta.modifiedClasses ) {
+                meta.modifiedClasses[kvp.Key] = new HashSet<string>( kvp.Value );
             }
 
             meta.modPath = modFile;
 
-            string currentModClass = string.Empty;
-            int modificationCount = -1;
-            HashSet<string> currentModifications = new HashSet<string>();
+            return meta;
+        }
 
-            for( int i = index; i < text.Length; i++ ) {
-                if( currentModClass == string.Empty ) {
-                    currentModClass = text[i];
-                    modificationCount = int.Parse( text[i + 1] );
-                    i++;
-                } else {
-                    if( modificationCount <= 0 ) {
-                        meta.modifiedClasses.Add( currentModClass, currentModifications );
-                        currentModClass = string.Empty;
-                        currentModifications = new HashSet<string>();
-                        modificationCount = -1;
-                        i--;
-                    } else {
-                        currentModifications.Add( text[i] );
-                        modificationCount--;
-                    }
-                }
-            }
+        public static ModMetadata ReadRawFromFile(string metaFile) {
+            string text = File.ReadAllText( metaFile );
+            int index = 0;
 
-            if( currentModifications.Count > 0 ) {
-                meta.modifiedClasses.Add( currentModClass, currentModifications );
+            ModMetadata meta = new ModMetadata();
+
+            Deserializer ds = new Deserializer();
+            ModJSONMetadata jsonMeta = ds.Deserialize<ModJSONMetadata>( text );
+
+            meta.isEnabled = jsonMeta.isEnabled;
+            meta.isPatch = jsonMeta.isPatch;
+            meta.isDirty = jsonMeta.isDirty;
+            meta.isStandalone = jsonMeta.isStandalone;
+
+            meta.modifiedClasses = new Dictionary<string, HashSet<string>>();
+            foreach( KeyValuePair<string, List<string>> kvp in jsonMeta.modifiedClasses ) {
+                meta.modifiedClasses[kvp.Key] = new HashSet<string>( kvp.Value );
             }
 
             return meta;
         }
 
         public static void WriteToFile(ModMetadata meta, string path) {
-            StringBuilder sb = new StringBuilder();
+            ModJSONMetadata JSON = new ModJSONMetadata() {
+                isDirty = meta.isDirty,
+                isEnabled = meta.isEnabled,
+                isPatch = meta.isPatch,
+                isStandalone = meta.isStandalone,
+                modifiedClasses = new Dictionary<string, List<string>>()
+            };
 
-            sb.AppendLine( meta.isEnabled.ToString() );
-            sb.AppendLine( meta.isPatch.ToString() );
-            sb.AppendLine( meta.isDirty.ToString() );
-
-            foreach( KeyValuePair<string, HashSet<string>> modClass in meta.modifiedClasses ) {
-                sb.AppendLine( modClass.Key );
-                sb.AppendLine( modClass.Value.Count.ToString() );
-                foreach( string s in modClass.Value ) {
-                    sb.AppendLine( s );
-                }
+            foreach( KeyValuePair<string, HashSet<string>> kvp in meta.modifiedClasses ) {
+                HashSet<string> modClassList = kvp.Value;
+                JSON.modifiedClasses[kvp.Key] = new List<string>( modClassList );
             }
 
-            File.WriteAllText( path, sb.ToString() );
+            Serializer s = new Serializer();
+            string json = s.Serialize( JSON );
+
+            File.WriteAllText( path, json );
         }
 
         public static bool CompareHashes(string fileToHash, string hashToCompare) {
@@ -233,5 +228,12 @@ namespace PartialityLauncher {
             return true;
         }
 
+        private class ModJSONMetadata {
+            public bool isEnabled { get; set; }
+            public bool isPatch { get; set; }
+            public bool isDirty { get; set; }
+            public bool isStandalone { get; set; }
+            public Dictionary<string, List<string>> modifiedClasses { get; set; }
+        }
     }
 }

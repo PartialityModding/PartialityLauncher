@@ -89,5 +89,15 @@ namespace PartialityLauncher.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] standaloneIcon {
+            get {
+                object obj = ResourceManager.GetObject("standaloneIcon", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

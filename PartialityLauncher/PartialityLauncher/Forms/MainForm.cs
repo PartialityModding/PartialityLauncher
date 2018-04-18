@@ -17,6 +17,7 @@ namespace PartialityLauncher {
 
         public Bitmap patchIcon;
         public Bitmap modIcon;
+        public Bitmap standaloneIcon;
 
         public Label gameNameLabel;
         public MaskedTextBox appidBox;
@@ -47,6 +48,9 @@ namespace PartialityLauncher {
             refreshMenuCommand.Executed += (sender, e) => GameManager.SaveAllMetadata();
             refreshMenuCommand.Executed += (sender, e) => FillOutMods();
 
+            var uninstallCommand = new Command();
+            uninstallCommand.Executed += (sender, e) => GameManager.Uninstall();
+
             gameWallpaper = new Bitmap( 125, 125, PixelFormat.Format24bppRgb, new List<int>() );
             runGameButton = new Button { Text = "Patch Game", Size = new Size( 475, 25 ), Command = runGameCommand, Enabled = false };
             gameNameLabel = new Label { Text = "Game Name", TextAlignment = TextAlignment.Left, Font = new Font( "SystemFont.Bold", 19.8f ) };
@@ -54,6 +58,7 @@ namespace PartialityLauncher {
 
             modIcon = new Bitmap( Resources.modIcon );
             patchIcon = new Bitmap( Resources.patchIcon );
+            standaloneIcon = new Bitmap( Resources.standaloneIcon );
             Bitmap bmp = new Bitmap( Resources.partiality_p_2 );
             Icon = new Icon( 1, bmp );
 
@@ -67,7 +72,23 @@ namespace PartialityLauncher {
                 Spacing = 10,
                 Items =
                 {
-                    new StackLayout{Orientation = Orientation.Horizontal, Spacing = 10,  Items = { gameWallpaper , new StackLayout { Items = { gameNameLabel, appidBox } }, new StackLayout { Spacing = 9, Items = { new Button { Text = "Refresh Mod List", Command = refreshMenuCommand}, new Button { Text = "Clear Mod Metadata", Command = clearMetaCommand } } } } },
+                    new StackLayout{Orientation = Orientation.Horizontal, Spacing = 10,
+                        Items = { gameWallpaper ,
+                            new StackLayout {
+                                Items = {
+                                    gameNameLabel,
+                                    appidBox
+                                }
+                            },
+                            new StackLayout { Spacing = 9,
+                                Items = {
+                                    new Button { Text = "Refresh Mod List", Command = refreshMenuCommand},
+                                    new Button { Text = "Clear Mod Metadata", Command = clearMetaCommand },
+                                    new Button { Text = "Uninstall Partiality", Command = uninstallCommand}
+                                }
+                            }
+                        }
+                    },
                     new Scrollable{ Content = modList, Size = new Size(475, 500), ExpandContentWidth = true, ExpandContentHeight = true },
                     runGameButton
                 }
@@ -130,7 +151,7 @@ namespace PartialityLauncher {
 
             int i = 0;
             foreach( ModMetadata md in GameManager.modMetas ) {
-                Bitmap icon = md.isPatch ? patchIcon : modIcon;
+                Bitmap icon = md.isStandalone ? standaloneIcon : ( md.isPatch ? patchIcon : modIcon );
                 Icon resized = icon.WithSize( 15, 15 );
 
                 int tmpIndex = i;
@@ -139,9 +160,12 @@ namespace PartialityLauncher {
                 cb.CheckedChanged += (a, b) => SetModEnabled( cb, tmpIndex );
 
                 StackLayout sl = new StackLayout {
+                    BackgroundColor = md.isStandalone ? new Color( 0.7f, 0.7f, 0.7f ) : new Color( 0, 0, 0, 0 ),
                     HorizontalContentAlignment = HorizontalAlignment.Left,
                     Orientation = Orientation.Horizontal,
                     Spacing = 10,
+                    Padding = 2,
+                    ToolTip = md.modPath,
                     Items = { resized, cb, Path.GetFileName( md.modPath ) },
                 };
                 modList.Items.Add( sl );
@@ -154,6 +178,18 @@ namespace PartialityLauncher {
             ModIncompatibilityWarning warningLevel = GameManager.CheckForModIncompatibilities( index );
             ModMetadata md = GameManager.modMetas[index];
             string fileName = Path.GetFileName( md.modPath );
+
+            if( md.isStandalone ) {
+                int i = 0;
+
+                foreach( ModMetadata oMD in GameManager.modMetas ) {
+                    if( oMD != md && oMD.isStandalone ) {
+                        oMD.isStandalone = false;
+                        ( ( modList.Items[i].Control as StackLayout ).Items[1].Control as CheckBox ).Checked = false;
+                    }
+                    i++;
+                }
+            }
 
             if( md.isEnabled == false ) {
                 if( warningLevel.warningLevel == 1 ) {

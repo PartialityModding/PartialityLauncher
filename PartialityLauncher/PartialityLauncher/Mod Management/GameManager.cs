@@ -58,7 +58,7 @@ namespace PartialityLauncher {
                 File.Create( Path.Combine( Directory.CreateDirectory( hashesFolder ).FullName, "IGNORE THIS FOLDER! It's just data for Partiality!" ) ).Dispose();
 
             if( !File.Exists( oldMetaChecker ) ) {
-                ClearMetas();
+                ClearMetas( true );
                 File.Create( oldMetaChecker );
                 DebugLogger.Log( "Clearing old metadata files!" );
             }
@@ -81,7 +81,7 @@ namespace PartialityLauncher {
 
             DebugLogger.Log( "Loaded metadata for " + modMetas.Count + " mods" );
         }
-        public static void ClearMetas() {
+        public static void ClearMetas(bool force = false) {
             string gameDirectory = Directory.GetParent( exePath ).FullName;
             string modFolder = Path.Combine( gameDirectory, "Mods" );
             string hashesFolder = Path.Combine( gameDirectory, "PartialityHashes" );
@@ -92,10 +92,15 @@ namespace PartialityLauncher {
             foreach( string s in modFiles ) {
                 string extension = Path.GetExtension( s );
                 if( extension == ".modMeta" ) {
-                    ModMetadata md = ModMetadata.ReadRawFromFile( s );
 
-                    if( md.isStandalone == false )
+                    if( force ) {
                         File.Delete( s );
+                    } else {
+                        ModMetadata md = ModMetadata.ReadRawFromFile( s );
+
+                        if( md.isStandalone == false )
+                            File.Delete( s );
+                    }
                 } else if( extension == ".modHash" ) {
                     File.Delete( s );
                 }

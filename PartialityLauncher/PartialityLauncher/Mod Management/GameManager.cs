@@ -115,7 +115,7 @@ namespace PartialityLauncher {
             foreach( string s in hashesFiles ) {
                 File.Delete( s );
             }
-            Directory.Delete( hashesFolder );
+            Directory.Delete( hashesFolder, true );
 
             string dataDirectory = Path.Combine( gameDirectory, Path.GetFileNameWithoutExtension( GameManager.exePath ) + "_Data" );
             string managedFolder = Path.Combine( dataDirectory, "Managed" );
@@ -128,7 +128,7 @@ namespace PartialityLauncher {
                 //Copy files from backup
                 PatchManager.CopyFilesRecursively( backupFolder, managedFolder );
                 //Delete backup
-                Directory.Delete( backupFolder );
+                Directory.Delete( backupFolder, true );
             }
         }
         public static bool IsValidGamePath(string exePath) {

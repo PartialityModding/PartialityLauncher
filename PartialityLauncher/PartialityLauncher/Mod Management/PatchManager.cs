@@ -33,6 +33,7 @@ namespace PartialityLauncher {
             string codeDll = Path.Combine( managedFolder, "Assembly-CSharp.dll" );
             string hookGenDLL = Path.Combine( managedFolder, "HOOKS-Assembly-CSharp.dll" );
             string engineDll = Path.Combine( managedFolder, "UnityEngine.dll" );
+            string coreModuleDLL = Path.Combine( managedFolder, "UnityEngine.CoreModule.dll" );
 
             string backupFolder = managedFolder + "_backup";
 
@@ -52,7 +53,15 @@ namespace PartialityLauncher {
 
             //Install the default patch for Partiality
             {
-                string moddedDLL = Path.Combine( Path.GetDirectoryName( engineDll ), "patched_UnityEngine.dll" );
+
+                string engineDLLName = "UnityEngine.dll";
+
+                if( File.Exists( coreModuleDLL ) ) {
+                    engineDLLName = "UnityEngine.CoreModule.dll";
+                    engineDll = coreModuleDLL;
+                }
+
+                string moddedDLL = Path.Combine( Path.GetDirectoryName( engineDll ), "patched" + engineDLLName );
                 string defaultPatchLocation = Path.Combine( executableDirectory, "PartialityPatch.dll" );
                 string partialityModLocation = Path.Combine( Path.GetDirectoryName( engineDll ), "Partiality.dll" );
 
@@ -74,7 +83,7 @@ namespace PartialityLauncher {
 
                     //Restore backup
                     File.Delete( engineDll );
-                    File.Copy( Path.Combine( backupFolder, "UnityEngine.dll" ), engineDll );
+                    File.Copy( Path.Combine( backupFolder, engineDLLName ), engineDll );
 
                     //Set monomod arguments to "[UnityEngine.dll] [PartialityPatch.dll] [patched_UnityEngine.dll]"
 

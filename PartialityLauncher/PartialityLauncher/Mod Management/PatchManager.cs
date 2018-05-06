@@ -255,6 +255,7 @@ namespace PartialityLauncher {
                     mm.Log( "[HookGen] Starting HookGenerator" );
                     HookGenerator gen = new HookGenerator( mm, Path.GetFileName( pathOut ) );
                     using( ModuleDefinition mOut = gen.OutputModule ) {
+                        gen.HookPrivate = true;
                         gen.Generate();
                         mOut.Write( pathOut );
                     }

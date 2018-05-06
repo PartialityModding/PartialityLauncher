@@ -154,7 +154,7 @@ namespace PartialityLauncher {
 
             meta.isEnabled = jsonMeta.isEnabled;
             meta.isPatch = jsonMeta.isPatch;
-            meta.isDirty = jsonMeta.isDirty;
+            meta.isDirty = isMatch;
             meta.isStandalone = jsonMeta.isStandalone;
 
             meta.modifiedClasses = new Dictionary<string, HashSet<string>>();
@@ -166,7 +166,6 @@ namespace PartialityLauncher {
 
             return meta;
         }
-
         public static ModMetadata ReadRawFromFile(string metaFile) {
             string text = File.ReadAllText( metaFile );
             int index = 0;

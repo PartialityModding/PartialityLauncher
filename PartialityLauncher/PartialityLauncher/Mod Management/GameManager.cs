@@ -153,8 +153,7 @@ namespace PartialityLauncher {
         public static void StartGame() {
             string gameDirectory = Directory.GetParent( exePath ).FullName;
 
-            if( !File.Exists( Path.Combine( gameDirectory, "appid.txt" ) ) && !File.Exists( Path.Combine( gameDirectory, "steam_appid.txt" ) ) )
-                File.WriteAllText( Path.Combine( gameDirectory, "appid.txt" ), appID );
+            File.WriteAllText( Path.Combine( gameDirectory, "appid.txt" ), appID );
 
             string executablePath = Assembly.GetEntryAssembly().Location;
             string executableDirectory = Directory.GetParent( executablePath ).FullName;
@@ -184,7 +183,8 @@ namespace PartialityLauncher {
                 if( parent != null )
                     MessageBox.Show( "No APPID found! Make sure to get one! There's a tutorial in your game's folder." );
                 File.WriteAllText(
-                    Path.Combine( mainPath, "HOW TO GET APPID.txt" ), "1: Go to store.steampowered.com " +
+                    Path.Combine( mainPath, "HOW TO GET APPID.txt" ),
+                    "1: Go to store.steampowered.com " +
                     "2: Search for the game " +
                     "3: The number after " + '"' + "app " + '"' + " in the URL for your game is the appID for the game. (For example, Slime Rancher's URL is " + '"' + "store.steampowered.com/app/433340/Slime_Rancher/" + '"' + ", the appid is, therefore, 433340.)"
                 );

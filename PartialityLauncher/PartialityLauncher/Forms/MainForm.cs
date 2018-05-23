@@ -52,7 +52,7 @@ namespace PartialityLauncher {
             uninstallCommand.Executed += (sender, e) => GameManager.Uninstall();
 
             gameWallpaper = new Bitmap( 125, 125, PixelFormat.Format24bppRgb, new List<int>() );
-            runGameButton = new Button { Text = "Patch Game", Size = new Size( 475, 25 ), Command = runGameCommand, Enabled = false };
+            runGameButton = new Button { Text = "Apply Mods", Size = new Size( 475, 25 ), Command = runGameCommand, Enabled = false };
             gameNameLabel = new Label { Text = "Game Name", TextAlignment = TextAlignment.Left, Font = new Font( "SystemFont.Bold", 19.8f ) };
             appidBox = new MaskedTextBox { ToolTip = "The APPID of the game", PlaceholderText = "APPID of the game", Size = new Size( 150, 25 ) };
 
@@ -172,7 +172,6 @@ namespace PartialityLauncher {
                 i++;
             }
         }
-
         public void SetModEnabled(CheckBox box, int index) {
 
             ModIncompatibilityWarning warningLevel = GameManager.CheckForModIncompatibilities( index );
@@ -217,21 +216,28 @@ namespace PartialityLauncher {
 
         public void PatchGame() {
             GameManager.SaveAllMetadata();
+            GameManager.appID = appidBox.Text;
+
+
             DebugLogger.Log( "Run Game" );
             GameManager.PatchGame();
 
-            DialogResult result = MessageBox.Show( this, "Game patched! Would you like to launch the game?", "Patch results", MessageBoxButtons.YesNo );
+            if( int.TryParse( appidBox.Text, out int id ) == false ) {
+                MessageBox.Show( this, "Mods applied! No/Incorrect APPID was entered, so the game can't be automatically launched. You can now launch the game yourself, as you normally would", "Mod Results", MessageBoxType.Information );
+            } else {
+                DialogResult result = MessageBox.Show( this, "Mods applied! Would you like to launch the game?", "Mod results", MessageBoxButtons.YesNo );
 
-            if( result == DialogResult.Yes ) {
+                if( result == DialogResult.Yes ) {
+                    foreach( Control c in Children )
+                        c.Enabled = false;
 
-                foreach( Control c in Children )
-                    c.Enabled = false;
+                    GameManager.StartGame();
 
-                GameManager.StartGame();
-
-                foreach( Control c in Children )
-                    c.Enabled = true;
+                    foreach( Control c in Children )
+                        c.Enabled = true;
+                }
             }
+
         }
     }
 }

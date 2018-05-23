@@ -178,6 +178,8 @@ namespace PartialityLauncher {
                     File.Delete( codeDll );
                     File.Copy( backupDll, codeDll );
 
+                    List<string> failedPatches = new List<string>();
+
                     foreach( ModMetadata md in GameManager.modMetas ) {
                         if( md.isPatch && md.isEnabled ) {
 
@@ -191,6 +193,9 @@ namespace PartialityLauncher {
                             DebugLogger.Log( "MMEC:" + exitCode );
                             DebugLogger.Log( mmoutput );
 
+                            if( exitCode != 0 ) {
+                                failedPatches.Add( Path.GetFileNameWithoutExtension( md.modPath ) );
+                            }
 
                             //Replace file
                             if( File.Exists( moddedDLL ) ) {
@@ -201,6 +206,9 @@ namespace PartialityLauncher {
                             }
                         }
                     }
+
+                    if( failedPatches.Count > 0 )
+                        Eto.Forms.MessageBox.Show( "Some mods failed to apply correctly! Please send your LOG.txt (in the Partiality folder) to someone who can help, probably from the people who made the mod." );
 
                     //Set mods to all not be dirty, and save them.
                     foreach( ModMetadata md in GameManager.modMetas ) {

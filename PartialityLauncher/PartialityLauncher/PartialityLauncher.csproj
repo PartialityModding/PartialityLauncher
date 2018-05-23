@@ -6,9 +6,9 @@
     <PackageVersion>1.0</PackageVersion>
     <Title>PartialityLauncher</Title>
     <Copyright>Copyright © 2018</Copyright>
-    <Description>A launcher used to install mods and patches in games</Description>
+    <Description>A launcher used to install mods and patches in Unity games</Description>
     <SignAssembly>true</SignAssembly>
-    <Version>0.3</Version>
+    <Version>0.3.8</Version>
     <PackageProjectUrl>https://github.com/PartialityModding</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PartialityModding</RepositoryUrl>
   </PropertyGroup>

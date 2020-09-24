@@ -127,8 +127,11 @@ namespace PartialityLauncher {
             string backupFolder = managedFolder + "_backup";
 
             if( Directory.Exists( backupFolder ) ) {
-                //Delete original, the re-create it
+                //Delete original, then re-create it
                 Directory.Delete( managedFolder, true );
+                while ( Directory.Exists( managedFolder ) )
+                    System.Threading.Thread.Sleep(10);
+                }
                 Directory.CreateDirectory( managedFolder );
                 //Copy files from backup
                 PatchManager.CopyFilesRecursively( backupFolder, managedFolder );
